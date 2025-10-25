@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+langchain>=0.0.200
+openai
+faiss-cpu
+youtube-transcript-api
+python-dotenv
+pydantic
+requests
+slowapi

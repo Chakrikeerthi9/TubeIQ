@@ -1,0 +1,57 @@
+# ---- General ----
+.DS_Store
+*.log
+*.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# ---- Python / FastAPI Backend ----
+.env
+venv/
+.env/
+.env.local
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+instance/
+*.pid
+
+# ---- LangChain / FAISS ----
+faiss_index/
+vector_store/
+*.pkl
+
+# ---- Node / React Frontend ----
+node_modules/
+build/
+dist/
+.next/
+out/
+coverage/
+*.local
+
+# ---- AWS / Docker ----
+.aws/
+*.pem
+*.key
+*.crt
+*.tfstate
+*.terraform/
+docker-compose.override.yml
+
+# ---- IDEs and Editors ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- Cursor specific ----
+.cursor/
+*.cursorbackup
+
+# macOS system files
+.DS_Store
