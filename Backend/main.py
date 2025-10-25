@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi import Request
 
 
-from lang import get_transcript_for_youtube
+from lang import get_transcript_for_youtube, video_vector_store
 from lang import summarize_transcript
 
 
@@ -26,10 +26,16 @@ def process_video(request: Request, payload: VideoRequest):
     video_id = payload.video_id
     video_url = payload.video_url
     transcript = get_transcript_for_youtube(video_id,video_url)
-    if transcript is None:
-        return {"message": "No transcript found for video ID", "video_id": payload.video_id, "video_url": payload.video_url}
+
+    vector_store = video_vector_store(transcript)
+    if vector_store is None:
+        return {"message": "No vector store found for video ID", "video_id": payload.video_id, "video_url": payload.video_url}
     else:
-        return {"message": "Transcript found for video ID", "transcript": transcript, "video_id": payload.video_id, "video_url": payload.video_url}
+        return {
+        "message": "Vector store successfully generated",
+        "video_id": payload.video_id,
+        "video_url": payload.video_url
+    }
     # summary = summarize_transcript(transcript)
 
 @app.post("/chat")
