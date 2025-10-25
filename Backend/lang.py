@@ -8,6 +8,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
+from langchain.chains import LLMChain
+from fastapi import HTTPException
 
 
 VECTOR_STORE_PATH = "data"
@@ -80,3 +82,38 @@ def summarize_transcript() -> str:
     chain = prompt | llm
     summary = chain.invoke({"context": context})
     return summary.content if hasattr(summary, "content") else str(summary)
+
+
+def chat_with_transcript(query: str) -> str:
+    try:
+        # 1️⃣ Load embeddings and stored FAISS index
+        embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL"))
+        vector_store = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
+
+        # 2️⃣ Retrieve top-matching transcript chunks
+        docs = vector_store.similarity_search(query, k=4)
+        if not docs:
+            raise ValueError("No relevant context found in the transcript.")
+
+        context = " ".join([d.page_content for d in docs])
+
+        # 3️⃣ LLM setup using LangChain’s LCEL pipeline
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        prompt = PromptTemplate(
+            template=(
+                "You are TubeIQ, a helpful assistant that answers questions based on a YouTube transcript.\n\n"
+                "Transcript context:\n{context}\n\n"
+                "Question: {question}\n\n"
+                "Provide a concise, accurate answer."
+            ),
+            input_variables=["context", "question"]
+        )
+        chain = LLMChain(prompt=prompt, llm=llm)
+
+        # 4️⃣ Get answer
+        response = chain.run({"context": context, "question": query})
+        return {"chat_id": str(uuid.uuid4()), "response": response}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing chat: {e}")
+

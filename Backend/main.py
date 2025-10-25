@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
-from lang import get_transcript_for_youtube, video_vector_store, summarize_transcript
+from lang import get_transcript_for_youtube, video_vector_store, summarize_transcript, chat_with_transcript
 
 app = FastAPI(title="TubeIQ Backend")
 
@@ -44,4 +44,5 @@ def chat(payload: ChatRequest):
         "message": "Chat processed successfully",
         "chat_id": payload.chat_id,
         "query": payload.query,
+        "response": chat_with_transcript(payload.query)
     }
