@@ -1,14 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
-from fastapi import Request
+from lang import get_transcript_for_youtube, video_vector_store, summarize_transcript
 
+app = FastAPI(title="TubeIQ Backend")
 
-from lang import get_transcript_for_youtube, video_vector_store
-from lang import summarize_transcript
-
-
-app = FastAPI()
-
+# Request Models
 class VideoRequest(BaseModel):
     video_id: str
     video_url: str
@@ -17,27 +13,35 @@ class ChatRequest(BaseModel):
     chat_id: str
     query: str
 
+
 @app.get("/")
 def root():
-    return {"message": "Hello World"}
+    return {"message": "TubeIQ API is running"}
+
 
 @app.post("/process_video")
-def process_video(request: Request, payload: VideoRequest):
-    video_id = payload.video_id
-    video_url = payload.video_url
-    transcript = get_transcript_for_youtube(video_id,video_url)
+def process_video(payload: VideoRequest):
+    try:
+        # Step 1: Fetch transcript
+        transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
 
-    vector_store = video_vector_store(transcript)
-    if vector_store is None:
-        return {"message": "No vector store found for video ID", "video_id": payload.video_id, "video_url": payload.video_url}
-    else:
-        return {
-        "message": "Vector store successfully generated",
-        "video_id": payload.video_id,
-        "video_url": payload.video_url
-    }
-    # summary = summarize_transcript(transcript)
+        # Step 2: Build vector store (auto-delete old store handled in lang.py)
+        vector_store = video_vector_store(transcript)
+
+        # Step 3: Generate summary
+        summary = summarize_transcript()
+        print(summary)
+
+    except Exception as e:
+        # Gracefully return the error
+        raise HTTPException(status_code=500, detail=f"Error processing video: {e}")
+
 
 @app.post("/chat")
-def chat(request: Request, payload: ChatRequest):
-    return {"message": "Chat processed successfully", "chat_id": payload.chat_id, "query": payload.query}
+def chat(payload: ChatRequest):
+    # Placeholder chat route (you can later integrate embedding-based Q&A)
+    return {
+        "message": "Chat processed successfully",
+        "chat_id": payload.chat_id,
+        "query": payload.query,
+    }
