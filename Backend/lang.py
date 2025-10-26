@@ -7,6 +7,7 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, No
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from fastapi import HTTPException
@@ -108,12 +109,8 @@ def chat_with_transcript(query: str) -> str:
             ),
             input_variables=["context", "question"]
         )
-        chain = LLMChain(prompt=prompt, llm=llm)
-
-        # 4️⃣ Get answer
-        response = chain.run({"context": context, "question": query})
-        return {"chat_id": str(uuid.uuid4()), "response": response}
-
+        messages = [HumanMessage(content=prompt.format_prompt(context=context, question=query).to_string())]
+        response = llm.invoke(messages)
+        return response.content if hasattr(response, "content") else str(response)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing chat: {e}")
-
+        raise RuntimeError(f"Chat error: {e}")

@@ -1,8 +1,17 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from lang import get_transcript_for_youtube, video_vector_store, summarize_transcript, chat_with_transcript
 
 app = FastAPI(title="TubeIQ Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Request Models
 class VideoRequest(BaseModel):
@@ -31,6 +40,9 @@ def process_video(payload: VideoRequest):
         # Step 3: Generate summary
         summary = summarize_transcript()
         print(summary)
+        return {
+            "summary": summary
+        }
 
     except Exception as e:
         # Gracefully return the error
@@ -41,8 +53,6 @@ def process_video(payload: VideoRequest):
 def chat(payload: ChatRequest):
     # Placeholder chat route (you can later integrate embedding-based Q&A)
     return {
-        "message": "Chat processed successfully",
         "chat_id": payload.chat_id,
-        "query": payload.query,
         "response": chat_with_transcript(payload.query)
     }
