@@ -51,7 +51,7 @@ def root():
 
 
 @app.post("/process_video")
-@limiter.limit("10/hour")
+@limiter.limit("100/hour")
 async def process_video(payload: VideoRequest, request: Request):
     try:
         # Step 1: Fetch transcript
