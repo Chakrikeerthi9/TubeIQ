@@ -31,7 +31,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_origin_regex="https://.*\\.vercel\\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -62,19 +61,20 @@ async def process_video(payload: VideoRequest, request: Request):
             
 
         # Step 1: Fetch transcript
-        transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
+    transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
 
         # Step 2: Build vector store (auto-delete old store handled in lang.py)
-        vector_store = video_vector_store(transcript)
+    vector_store = video_vector_store(transcript)
 
         # Step 3: Generate summary
-        summary = summarize_transcript()
-        print(summary)
+    summary = summarize_transcript()
+    print(summary)
 
         # upload_embeddings_to_s3()
-        return {
-            "summary": summary
-        }
+    return {
+        "summary": summary
+    }
+    
 
 
 @app.post("/chat")
