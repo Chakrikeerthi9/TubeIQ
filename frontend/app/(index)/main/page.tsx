@@ -109,7 +109,7 @@ export default function Main() {
 
     try {
       // Send chat request to backend
-      const response = await fetch('http://107.21.77.174:8000/chat', {
+      const response = await fetch('https://tubeiq.onrender.com/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

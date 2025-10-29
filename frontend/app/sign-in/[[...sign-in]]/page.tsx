@@ -11,7 +11,7 @@ export default async function Page() {
       const clerkUserId = user.id;
 
       const fetchData = async () => {
-        const res = await fetch("http://107.21.77.174:8000/process_video", {
+        const res = await fetch("https://tubeiq.onrender.com/process_video", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
