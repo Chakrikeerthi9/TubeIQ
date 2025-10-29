@@ -5,6 +5,7 @@ from lang import get_transcript_for_youtube, video_vector_store, summarize_trans
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from embeddings_manager import download_embeddings_from_s3, upload_embeddings_to_s3
 
 def get_user_key(request: Request) -> str:
     user_id = request.headers.get("x-clerk-user-id")
@@ -47,6 +48,12 @@ def root():
 @limiter.limit("10/hour")
 async def process_video(payload: VideoRequest, request: Request):
     try:
+        if download_embeddings_from_s3():
+            print("Embeddings downloaded from S3.")
+        else:
+            print("Embeddings not found on S3. Downloading from local storage.")
+            
+
         # Step 1: Fetch transcript
         transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
 
@@ -56,6 +63,8 @@ async def process_video(payload: VideoRequest, request: Request):
         # Step 3: Generate summary
         summary = summarize_transcript()
         print(summary)
+
+        upload_embeddings_to_s3()
         return {
             "summary": summary
         }
