@@ -51,7 +51,7 @@ export default function Main() {
 
     try {
       // Send request to backend
-      const response = await fetch('http://127.0.0.1:8000/process_video', {
+      const response = await fetch('http://107.21.77.174:8000/process_video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export default function Main() {
 
     try {
       // Send chat request to backend
-      const response = await fetch('http://127.0.0.1:8000/chat', {
+      const response = await fetch('http://107.21.77.174:8000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
