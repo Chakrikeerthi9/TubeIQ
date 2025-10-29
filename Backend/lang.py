@@ -20,23 +20,24 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL")
 
-
-def get_transcript_for_youtube(video_id: str, video_url: str) -> str:
+def get_transcript_for_youtube(video_url: str) -> str:
+    print("1")
     parsed = urlparse(video_url)
     if parsed.netloc in ("youtu.be", "www.youtu.be"):
         video_code = parsed.path.lstrip("/")
+        print("2")
     else:
         query = parse_qs(parsed.query)
         video_code = query.get("v", [None])[0]
-
+        print("3")
     if not video_code:
         raise ValueError(f"Invalid YouTube URL: {video_url}")
-
-
+    print("4")
     try:
         yt_api = YouTubeTranscriptApi()
         transcript = yt_api.fetch(video_code)
         transcript_text = " ".join([s.text for s in transcript.snippets])
+        print("5")
         return transcript_text.strip()
     except (TranscriptsDisabled, NoTranscriptFound):
         raise RuntimeError(f"No transcript found for this video: {video_url}")

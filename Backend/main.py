@@ -51,23 +51,26 @@ def root():
 
 
 @app.post("/process_video")
-@limiter.limit("100/hour")
+@limiter.limit("10/hour")
 async def process_video(payload: VideoRequest, request: Request):
     try:
+        print("1")
         # Step 1: Fetch transcript
-        transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
-
+        transcript = get_transcript_for_youtube(payload.video_url)
+        print("Transcript fetched...")
         # Step 2: Build vector store (auto-delete old store handled in lang.py)
         vector_store = video_vector_store(transcript)
-
+        print("Vector store built...")
         # Step 3: Generate summary
         summary = summarize_transcript()
+        print("Summary generated...")
         print(summary)
         return {
             "summary": summary
         }
 
     except Exception as e:
+        print(f"Error processing video: {e}")
         # Gracefully return the error
         raise HTTPException(status_code=500, detail=f"Error processing video: {e}")
 
