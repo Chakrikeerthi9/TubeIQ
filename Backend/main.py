@@ -15,7 +15,7 @@ def get_user_key(request: Request) -> str:
 
 app = FastAPI(title="TubeIQ Backend")
 
-limiter = Limiter(key_func=get_user_key, default_limits=["100/hour"])
+limiter = Limiter(key_func=get_user_key, default_limits=["50/hour"])
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -51,7 +51,7 @@ def root():
 
 
 @app.post("/process_video")
-@limiter.limit("100/hour")
+@limiter.limit("50/hour")
 async def process_video(payload: VideoRequest, request: Request):
     try:
         print("1")
@@ -78,7 +78,7 @@ async def process_video(payload: VideoRequest, request: Request):
 
 
 @app.post("/chat")
-@limiter.limit("100/hour")
+@limiter.limit("50/hour")
 async def chat(payload: ChatRequest, request: Request):
     # Placeholder chat route (you can later integrate embedding-based Q&A)
     return {
