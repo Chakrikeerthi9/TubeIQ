@@ -51,7 +51,7 @@ export default function Main() {
 
     try {
       // Send request to backend
-      const response = await fetch('http://107.21.77.174:8000/process_video', {
+      const response = await fetch('https://tubeiq.onrender.com/process_video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
