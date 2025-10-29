@@ -21,9 +21,15 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
+origins = [
+    "https://tube-iq.vercel.app",  # your frontend on Vercel
+    "http://localhost:3000",       # local testing (optional)
+    "https://tubeiq.onrender.com", # self origin for safety
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tube-iq.vercel.app"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
