@@ -29,7 +29,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,13 +53,6 @@ def root():
 @app.post("/process_video")
 @limiter.limit("10/hour")
 async def process_video(payload: VideoRequest, request: Request):
-    # try:
-    #     if download_embeddings_from_s3():
-    #         print("Embeddings downloaded from S3.")
-    #     else:
-    #         print("Embeddings not found on S3. Downloading from local storage.")
-            
-
         # Step 1: Fetch transcript
     transcript = get_transcript_for_youtube(payload.video_id, payload.video_url)
 
@@ -68,9 +61,6 @@ async def process_video(payload: VideoRequest, request: Request):
 
         # Step 3: Generate summary
     summary = summarize_transcript()
-    print(summary)
-
-        # upload_embeddings_to_s3()
     return {
         "summary": summary
     }
