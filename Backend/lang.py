@@ -91,6 +91,7 @@ def chat_with_transcript(query: str) -> str:
         # 1️⃣ Load embeddings and stored FAISS index
         embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL"))
         vector_store = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
+        print("Vector store loaded...")
 
         # 2️⃣ Retrieve top-matching transcript chunks
         docs = vector_store.similarity_search(query, k=4)
